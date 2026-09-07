@@ -20,7 +20,7 @@ export default function TemplateGallery({
       >
         <div className="flex items-center justify-between border-b border-border px-5 py-3.5">
           <div>
-            <h2 className="text-base font-semibold text-ink">Block Diagram Templates</h2>
+            <h2 className="font-serif text-xl text-ink">Block Diagram Templates</h2>
             <p className="text-xs text-ink-faint">Start from a proven process shape, then refine it with AI.</p>
           </div>
           <button onClick={onClose} className="grid h-8 w-8 place-items-center rounded-md text-ink-faint hover:bg-surface-2">

@@ -226,6 +226,28 @@ export const IconImage = (p: IconProps) => (
     <path d="M21 15l-5-5L5 21" />
   </svg>
 );
+export const IconSearch = (p: IconProps) => (
+  <svg {...base(p)}>
+    <circle cx="11" cy="11" r="7" />
+    <path d="M21 21l-4.3-4.3" />
+  </svg>
+);
+export const IconFolder = (p: IconProps) => (
+  <svg {...base(p)}>
+    <path d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V7z" />
+  </svg>
+);
+export const IconHexagon = (p: IconProps) => (
+  <svg {...base(p)}>
+    <path d="M12 2l8.66 5v10L12 22l-8.66-5V7z" />
+  </svg>
+);
+export const IconUser = (p: IconProps) => (
+  <svg {...base(p)}>
+    <circle cx="12" cy="8" r="4" />
+    <path d="M4 21c1.5-4 5-6 8-6s6.5 2 8 6" />
+  </svg>
+);
 export const IconDatabase = (p: IconProps) => (
   <svg {...base(p)}>
     <ellipse cx="12" cy="5" rx="8" ry="3" />

@@ -32,7 +32,7 @@ export default function EvidencePanel() {
         <div className="flex items-center justify-between border-b border-border px-5 py-3.5">
           <div>
             <p className="text-xs font-semibold uppercase tracking-wide text-brand-deep">Evidence</p>
-            <h2 className="text-base font-semibold text-ink">{node.label}</h2>
+            <h2 className="font-serif text-xl text-ink">{node.label}</h2>
           </div>
           <button
             onClick={() => dispatch({ type: "SET_EVIDENCE_NODE", id: null })}

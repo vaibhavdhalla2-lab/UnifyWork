@@ -1,4 +1,5 @@
 import { useApp } from "./lib/store";
+import Sidebar from "./components/shared/Sidebar";
 import TopNav from "./components/TopNav";
 import ChatPanel from "./components/chat/ChatPanel";
 import LandingScreen from "./components/landing/LandingScreen";
@@ -24,27 +25,30 @@ export default function App() {
   }
 
   return (
-    <div className="flex h-screen w-screen flex-col overflow-hidden">
-      {state.model ? (
-        <>
-          <TopNav />
-          <div className="flex flex-1 overflow-hidden">
-            <ChatPanel />
-            {state.view === "diagram" && <Canvas />}
-            {state.view === "mermaid" && <MermaidView />}
-            {state.view === "documentation" && <DocumentationView />}
-            <RightPanel />
-          </div>
-        </>
-      ) : (
-        <LandingScreen />
-      )}
+    <div className="flex h-screen w-screen overflow-hidden">
+      <Sidebar />
+      <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
+        {state.model ? (
+          <>
+            <TopNav />
+            <div className="flex flex-1 overflow-hidden">
+              <ChatPanel />
+              {state.view === "diagram" && <Canvas />}
+              {state.view === "mermaid" && <MermaidView />}
+              {state.view === "documentation" && <DocumentationView />}
+              <RightPanel />
+            </div>
+          </>
+        ) : (
+          <LandingScreen />
+        )}
 
-      <PlanView />
-      <BuildProgress />
-      <ModifyPreviewModal />
-      <EvidencePanel />
-      <Toasts />
+        <PlanView />
+        <BuildProgress />
+        <ModifyPreviewModal />
+        <EvidencePanel />
+        <Toasts />
+      </div>
     </div>
   );
 }
