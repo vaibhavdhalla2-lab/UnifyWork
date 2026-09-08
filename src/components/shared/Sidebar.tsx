@@ -10,8 +10,8 @@ export default function Sidebar() {
 
   return (
     <aside className="relative flex w-16 shrink-0 flex-col items-center gap-1 border-r border-black/20 bg-sidebar py-4">
-      <span className="mb-4 grid h-8 w-8 place-items-center rounded-full bg-sidebar-2 text-sidebar-ink">
-        <span className="h-2.5 w-2.5 rounded-full bg-current" />
+      <span className="mb-4 grid h-9 w-9 place-items-center rounded-full bg-sidebar-2">
+        <img src="/logo.svg" alt="" className="h-6 w-6" />
       </span>
 
       <RailButton

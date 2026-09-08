@@ -5,7 +5,6 @@ import { useEscapeKey } from "../hooks/useEscapeKey";
 import {
   IconUndo,
   IconRedo,
-  IconComment,
   IconDoc,
   IconMermaid,
   IconExport,
@@ -44,11 +43,8 @@ export default function TopNav() {
           className="flex items-center gap-2 shrink-0"
           title="FlowBuilder AI — start a new process"
         >
-          <span className="grid h-7 w-7 place-items-center rounded-lg bg-brand text-white">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M6 5h8a3 3 0 010 6h-4v8" />
-              <circle cx="18" cy="17" r="2.4" />
-            </svg>
+          <span className="grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-brand-soft">
+            <img src="/logo.svg" alt="" className="h-5 w-5" />
           </span>
           <span className="font-semibold tracking-tight text-ink">FlowBuilder AI</span>
         </button>
@@ -143,23 +139,6 @@ export default function TopNav() {
       </div>
 
       <div className="flex shrink-0 items-center gap-1.5">
-        <button
-          onClick={() => {
-            dispatch({ type: "SET_RIGHT_PANEL_MODE", mode: "comments" });
-            dispatch({ type: "SET_COMMENTS_TARGET", target: { scope: "diagram" } });
-          }}
-          className="flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-sm font-medium text-ink-soft hover:bg-surface-2"
-          title="Comments"
-        >
-          <IconComment />
-          <span className="hidden lg:inline">Comments</span>
-          {(() => {
-            const total = state.diagramComments.length + (state.model?.nodes.reduce((s, n) => s + n.comments.length, 0) ?? 0);
-            return total > 0 ? (
-              <span className="rounded-full bg-brand-soft px-1.5 text-xs font-semibold text-brand-deep">{total}</span>
-            ) : null;
-          })()}
-        </button>
         <div className="relative">
           <button
             onClick={() => setExportOpen((v) => !v)}

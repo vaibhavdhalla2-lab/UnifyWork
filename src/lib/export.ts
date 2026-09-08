@@ -9,7 +9,7 @@ import {
   AlignmentType,
 } from "docx";
 import { toJpeg, toPng } from "html-to-image";
-import { canvasElRef } from "./canvasRef";
+import { canvasElRef, canvasSizeRef } from "./canvasRef";
 
 function downloadBlob(blob: Blob, filename: string) {
   const url = URL.createObjectURL(blob);
@@ -40,11 +40,33 @@ function slug(s: string): string {
   return s.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "") || "process";
 }
 
+// The captured element is React Flow's `.react-flow__viewport`, which normally
+// carries a translate/scale transform reflecting the user's current pan & zoom.
+// To export the *full* diagram regardless of what's currently in view, we
+// override that transform to identity and size the capture to the diagram's
+// full natural bounds (tracked in canvasSizeRef by Canvas.tsx).
+// Most browsers cap a single canvas dimension around 16384px. A tall/wide
+// diagram at a high pixelRatio can silently exceed that and get truncated,
+// so the effective ratio is capped to whatever the diagram's own size allows.
+const MAX_CANVAS_DIMENSION = 16000;
+
+function exportOverrides(desiredPixelRatio: number) {
+  const { width, height } = canvasSizeRef.current;
+  const maxDim = Math.max(width, height, 1);
+  const pixelRatio = Math.min(desiredPixelRatio, MAX_CANVAS_DIMENSION / maxDim);
+  return {
+    width,
+    height,
+    pixelRatio,
+    style: { width: `${width}px`, height: `${height}px`, transform: "translate(0px, 0px) scale(1)" },
+  };
+}
+
 async function snapshotCanvas(): Promise<string | null> {
   const el = canvasElRef.current;
   if (!el) return null;
   try {
-    return await toJpeg(el, { backgroundColor: "#ffffff", pixelRatio: 1.5, quality: 0.85 });
+    return await toJpeg(el, { backgroundColor: "#ffffff", quality: 0.85, ...exportOverrides(1.5) });
   } catch {
     return null;
   }
@@ -54,7 +76,7 @@ export async function exportPng(processName: string): Promise<boolean> {
   const el = canvasElRef.current;
   if (!el) return false;
   try {
-    const dataUrl = await toPng(el, { backgroundColor: "#14161d", pixelRatio: 3, cacheBust: true });
+    const dataUrl = await toPng(el, { backgroundColor: "#ffffff", cacheBust: true, ...exportOverrides(3) });
     const blob = await (await fetch(dataUrl)).blob();
     downloadBlob(blob, `${slug(processName)}.png`);
     return true;
