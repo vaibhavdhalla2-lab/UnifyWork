@@ -1,12 +1,8 @@
 import { useApp } from "./lib/store";
 import Sidebar from "./components/shared/Sidebar";
-import TopNav from "./components/TopNav";
 import ChatPanel from "./components/chat/ChatPanel";
 import LandingScreen from "./components/landing/LandingScreen";
-import RightPanel from "./components/RightPanel";
-import Canvas from "./components/Canvas";
-import MermaidView from "./components/MermaidView";
-import DocumentationView from "./components/DocumentationView";
+import ArtifactPanel from "./components/artifact/ArtifactPanel";
 import PlanView from "./components/PlanView";
 import BuildProgress from "./components/BuildProgress";
 import ModifyPreviewModal from "./components/ModifyPreviewModal";
@@ -27,28 +23,22 @@ export default function App() {
   return (
     <div className="flex h-screen w-screen overflow-hidden">
       <Sidebar />
-      <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
+      <div className="flex min-w-0 flex-1 overflow-hidden">
         {state.model ? (
           <>
-            <TopNav />
-            <div className="flex flex-1 overflow-hidden">
-              <ChatPanel />
-              {state.view === "diagram" && <Canvas />}
-              {state.view === "mermaid" && <MermaidView />}
-              {state.view === "documentation" && <DocumentationView />}
-              <RightPanel />
-            </div>
+            <ChatPanel />
+            <ArtifactPanel />
           </>
         ) : (
           <LandingScreen />
         )}
-
-        <PlanView />
-        <BuildProgress />
-        <ModifyPreviewModal />
-        <EvidencePanel />
-        <Toasts />
       </div>
+
+      <PlanView />
+      <BuildProgress />
+      <ModifyPreviewModal />
+      <EvidencePanel />
+      <Toasts />
     </div>
   );
 }

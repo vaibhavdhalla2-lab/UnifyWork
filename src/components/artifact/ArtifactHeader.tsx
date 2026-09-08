@@ -1,23 +1,12 @@
 import { useEffect, useRef, useState } from "react";
-import { useApp } from "../lib/store";
-import { useFlowActions } from "../lib/actions";
-import { useEscapeKey } from "../hooks/useEscapeKey";
-import {
-  IconUndo,
-  IconRedo,
-  IconDoc,
-  IconMermaid,
-  IconExport,
-  IconChevronDown,
-  IconClock,
-  IconRestore,
-  IconCheck,
-} from "./icons";
-import ExportMenu from "./ExportMenu";
+import { useApp } from "../../lib/store";
+import { useFlowActions } from "../../lib/actions";
+import { useEscapeKey } from "../../hooks/useEscapeKey";
+import { IconUndo, IconRedo, IconDoc, IconMermaid, IconExport, IconChevronDown, IconClock, IconRestore, IconCheck } from "../icons";
+import ExportMenu from "../ExportMenu";
 
-export default function TopNav() {
+export default function ArtifactHeader() {
   const { state, dispatch } = useApp();
-  const actions = useFlowActions();
   const [editingName, setEditingName] = useState(false);
   const [nameDraft, setNameDraft] = useState(state.processName);
   const [exportOpen, setExportOpen] = useState(false);
@@ -33,62 +22,45 @@ export default function TopNav() {
 
   return (
     <header className="flex h-14 shrink-0 items-center justify-between border-b border-border bg-surface px-4 gap-4">
-      <div className="flex min-w-0 items-center gap-3">
-        <button
-          onClick={() => {
-            if (confirm("Start a new process? This clears the current diagram from view (your saved data stays until you reload).")) {
-              actions.newProcess();
-            }
-          }}
-          className="flex items-center gap-2 shrink-0"
-          title="FlowBuilder AI — start a new process"
-        >
-          <span className="grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-brand-soft">
-            <img src="/logo.svg" alt="" className="h-5 w-5" />
-          </span>
-          <span className="font-semibold tracking-tight text-ink">FlowBuilder AI</span>
-        </button>
-        <div className="h-5 w-px bg-border shrink-0" />
-        <div className="min-w-0 flex items-center gap-2">
-          {editingName ? (
-            <input
-              autoFocus
-              value={nameDraft}
-              onChange={(e) => setNameDraft(e.target.value)}
-              onBlur={commitName}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") commitName();
-                if (e.key === "Escape") {
-                  setNameDraft(state.processName);
-                  setEditingName(false);
-                }
-              }}
-              className="min-w-0 max-w-[220px] rounded-md border border-brand px-2 py-1 text-sm font-medium text-ink outline-none"
-            />
-          ) : (
-            <button
-              onClick={() => {
+      <div className="flex min-w-0 items-center gap-2">
+        {editingName ? (
+          <input
+            autoFocus
+            value={nameDraft}
+            onChange={(e) => setNameDraft(e.target.value)}
+            onBlur={commitName}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") commitName();
+              if (e.key === "Escape") {
                 setNameDraft(state.processName);
-                setEditingName(true);
-              }}
-              className="truncate max-w-[220px] rounded-md px-1.5 py-1 text-sm font-medium text-ink-soft hover:bg-surface-2 hover:text-ink"
-              title="Rename process"
-            >
-              {state.processName}
-            </button>
+                setEditingName(false);
+              }
+            }}
+            className="min-w-0 max-w-[260px] rounded-md border border-brand px-2 py-1 font-serif text-base text-ink outline-none"
+          />
+        ) : (
+          <button
+            onClick={() => {
+              setNameDraft(state.processName);
+              setEditingName(true);
+            }}
+            className="truncate max-w-[260px] rounded-md px-1.5 py-1 font-serif text-base text-ink hover:bg-surface-2"
+            title="Rename process"
+          >
+            {state.processName}
+          </button>
+        )}
+        <span className="hidden shrink-0 items-center gap-1 text-xs text-ink-faint sm:flex">
+          {state.savedStatus === "saved" ? (
+            <>
+              <span className="h-1.5 w-1.5 rounded-full bg-success" /> Saved
+            </>
+          ) : (
+            <>
+              <span className="h-1.5 w-1.5 rounded-full bg-warn animate-pulse-soft" /> Saving…
+            </>
           )}
-          <span className="hidden shrink-0 items-center gap-1 text-xs text-ink-faint sm:flex">
-            {state.savedStatus === "saved" ? (
-              <>
-                <span className="h-1.5 w-1.5 rounded-full bg-success" /> Saved
-              </>
-            ) : (
-              <>
-                <span className="h-1.5 w-1.5 rounded-full bg-warn animate-pulse-soft" /> Saving…
-              </>
-            )}
-          </span>
-        </div>
+        </span>
         <VersionDropdown />
       </div>
 
