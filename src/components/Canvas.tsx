@@ -6,6 +6,7 @@ import {
   BackgroundVariant,
   MiniMap,
   MarkerType,
+  PanOnScrollMode,
   useReactFlow,
   useViewport,
   type Node,
@@ -148,6 +149,11 @@ function CanvasInner() {
         elementsSelectable
         minZoom={0.15}
         maxZoom={2}
+        panOnScroll
+        panOnScrollMode={PanOnScrollMode.Free}
+        zoomOnScroll={false}
+        zoomOnPinch
+        zoomOnDoubleClick={false}
         proOptions={{ hideAttribution: true }}
         defaultEdgeOptions={{ type: "smoothstep" }}
       >

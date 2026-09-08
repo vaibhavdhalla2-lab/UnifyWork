@@ -65,57 +65,123 @@ export function buildDemoModel(): ProcessModel {
         slackThread('"We keep seeing orders missing the contract reference — flag those before they reach credit." — Order Desk Lead'),
       ],
     }),
-    node("order_complete", "decision", "Order Complete?", { description: "Checks whether all mandatory fields, pricing and contract terms are present." }),
-    node("correct_resubmit", "process", "Correct & Resubmit", { actor: "Sales", description: "Sales corrects the missing or incorrect fields and resubmits for validation." }),
+    node("order_complete", "decision", "Order Complete?", {
+      description: "Checks whether all mandatory fields, pricing and contract terms are present.",
+      sources: [sopDoc("Page 4", "An order is not considered complete until mandatory fields, pricing and contract terms all pass validation.")],
+    }),
+    node("correct_resubmit", "process", "Correct & Resubmit", {
+      actor: "Sales",
+      description: "Sales corrects the missing or incorrect fields and resubmits for validation.",
+      sources: [slackThread('"We keep seeing orders missing the contract reference — flag those before they reach credit." — Order Desk Lead')],
+    }),
     node("credit_check", "process", "Credit Check", {
       actor: "Finance",
       description: "Finance runs a credit check against the customer's credit standing and open balance.",
       sources: [financePolicy("Page 1", "All new orders above the customer's approved credit limit require a credit check before an SAP order is created.")],
     }),
-    node("credit_decision", "decision", "Credit Approved?", { comments: [creditComment] }),
+    node("credit_decision", "decision", "Credit Approved?", {
+      comments: [creditComment],
+      sources: [financePolicy("Page 2", "Orders within the approved credit limit proceed automatically; orders over the limit are flagged for Credit Manager review.")],
+    }),
     node("credit_manager_review", "process", "Credit Manager Review", {
       actor: "Credit Manager",
       description: "The Credit Manager reviews the flagged order and decides how to proceed.",
       sources: [opsEmail('"Anything over the limit comes to me directly — I can approve, ask for security, or reject." — Credit Manager')],
     }),
-    node("credit_manager_decision", "decision", "Manager Decision"),
-    node("request_security", "process", "Request Security Deposit", { actor: "Finance", description: "Finance requests a deposit or security to offset the credit risk." }),
+    node("credit_manager_decision", "decision", "Manager Decision", {
+      sources: [opsEmail('"I\'ll approve, ask for a security deposit, or reject — those are the only three outcomes I use." — Credit Manager')],
+    }),
+    node("request_security", "process", "Request Security Deposit", {
+      actor: "Finance",
+      description: "Finance requests a deposit or security to offset the credit risk.",
+      sources: [financePolicy("Page 3", "A security deposit equal to the flagged order value may be requested in lieu of an outright rejection.")],
+    }),
     node("order_rejected", "end", "Order Rejected"),
     node("sap_order", "process", "Create SAP Sales Order", {
       actor: "Sales Operations",
       description: "System: SAP. The approved order is created as a sales order in SAP.",
       sources: [walkthroughVideo("02:10", '"...once credit clears, the order flows into SAP automatically as a sales order..."')],
     }),
-    node("inventory_check", "process", "Inventory Check", { actor: "Warehouse", description: "Warehouse confirms stock availability for every line item." }),
-    node("finance_validation", "process", "Finance Validation", { actor: "Finance", description: "Finance validates pricing, tax and billing details in parallel with the inventory check." }),
-    node("fulfilment", "process", "Prepare Shipment", { actor: "Warehouse", description: "Warehouse picks, packs and stages the order once both inventory and finance checks clear." }),
-    node("delivery_attempt", "process", "Delivery Attempt", { actor: "Warehouse", description: "The carrier attempts delivery to the customer's address." }),
-    node("delivered", "decision", "Delivered?"),
-    node("retries_exhausted", "decision", "Retried Twice Already?"),
-    node("retry_delivery", "process", "Retry Delivery", { actor: "Warehouse", description: "A second delivery attempt is scheduled with the carrier." }),
+    node("inventory_check", "process", "Inventory Check", {
+      actor: "Warehouse",
+      description: "Warehouse confirms stock availability for every line item.",
+      sources: [sopDoc("Page 11", "Warehouse must confirm on-hand stock for every line item before fulfilment can begin.")],
+    }),
+    node("finance_validation", "process", "Finance Validation", {
+      actor: "Finance",
+      description: "Finance validates pricing, tax and billing details in parallel with the inventory check.",
+      sources: [financePolicy("Page 4", "Pricing, tax and billing details are validated by Finance in parallel with the warehouse inventory check.")],
+    }),
+    node("fulfilment", "process", "Prepare Shipment", {
+      actor: "Warehouse",
+      description: "Warehouse picks, packs and stages the order once both inventory and finance checks clear.",
+      sources: [sopDoc("Page 12", "Picking, packing and staging begin only once both the inventory check and finance validation have cleared.")],
+    }),
+    node("delivery_attempt", "process", "Delivery Attempt", {
+      actor: "Warehouse",
+      description: "The carrier attempts delivery to the customer's address.",
+      sources: [walkthroughVideo("04:32", '"...the carrier makes the first delivery attempt within 24 hours of the shipment leaving the warehouse..."')],
+    }),
+    node("delivered", "decision", "Delivered?", {
+      sources: [sopDoc("Page 13", "Delivery confirmation from the carrier determines whether the order proceeds to invoicing or a retry.")],
+    }),
+    node("retries_exhausted", "decision", "Retried Twice Already?", {
+      sources: [sopDoc("Page 14", "Up to two delivery attempts are made with the carrier before the order is escalated to the Customer Service Manager.")],
+    }),
+    node("retry_delivery", "process", "Retry Delivery", {
+      actor: "Warehouse",
+      description: "A second delivery attempt is scheduled with the carrier.",
+      sources: [sopDoc("Page 14", "A second delivery attempt is scheduled automatically with the same carrier after a failed first attempt.")],
+    }),
     node("escalate_csm", "process", "Escalate to Customer Service Manager", {
       actor: "Customer Service Manager",
       description: "After two failed attempts, the Customer Service Manager contacts the customer to arrange delivery.",
+      sources: [opsEmail('"After two failed attempts, route it to me directly and I\'ll coordinate with the customer." — Customer Service Manager')],
     }),
-    node("invoice", "process", "Generate Invoice", { actor: "Finance", description: "Finance generates the invoice from the fulfilled order." }),
-    node("invoice_correct", "decision", "Invoice Correct?"),
-    node("correct_invoice", "process", "Correct Invoice", { actor: "Finance", description: "Finance corrects pricing or line-item errors on the invoice." }),
+    node("invoice", "process", "Generate Invoice", {
+      actor: "Finance",
+      description: "Finance generates the invoice from the fulfilled order.",
+      sources: [sopDoc("Page 8", "The invoice is generated from the fulfilled order record, carrying over final quantities and pricing.")],
+    }),
+    node("invoice_correct", "decision", "Invoice Correct?", {
+      sources: [sopDoc("Page 9", "Invoices are checked for pricing and line-item accuracy before being sent to the customer.")],
+    }),
+    node("correct_invoice", "process", "Correct Invoice", {
+      actor: "Finance",
+      description: "Finance corrects pricing or line-item errors on the invoice.",
+      sources: [slackThread('"Flag any invoice mismatch before it goes out — Finance will fix it same day." — Order Desk Lead')],
+    }),
     node("send_invoice", "process", "Send Invoice to Customer", {
       actor: "Finance",
       sources: [sopDoc("Page 9", "Invoices must be sent to the customer within one business day of fulfilment.")],
     }),
-    node("monitor_receivable", "process", "Monitor Receivable", { actor: "Collections", description: "Collections tracks the invoice against its due date." }),
-    node("payment_received", "decision", "Payment Received?"),
-    node("grace_period", "process", "Grace Period", { actor: "Collections", description: "A short grace period is applied before follow-up begins." }),
-    node("still_unpaid", "decision", "Still Unpaid After Grace Period?"),
+    node("monitor_receivable", "process", "Monitor Receivable", {
+      actor: "Collections",
+      description: "Collections tracks the invoice against its due date.",
+      sources: [financePolicy("Page 5", "Collections tracks every open invoice against its due date from the moment it is sent.")],
+    }),
+    node("payment_received", "decision", "Payment Received?", {
+      sources: [financePolicy("Page 5", "Payment status is checked against the due date to determine whether the receivable can be closed or needs follow-up.")],
+    }),
+    node("grace_period", "process", "Grace Period", {
+      actor: "Collections",
+      description: "A short grace period is applied before follow-up begins.",
+      sources: [financePolicy("Page 6", "A short grace period is applied after the due date before active collections follow-up begins.")],
+    }),
+    node("still_unpaid", "decision", "Still Unpaid After Grace Period?", {
+      sources: [financePolicy("Page 6", "Accounts still unpaid after the grace period move to active collections follow-up.")],
+    }),
     node("collections_followup", "process", "Collections Follow-up", {
       actor: "Collections",
       sources: [financePolicy("Page 6", "Accounts unpaid after the grace period move to active collections follow-up.")],
     }),
-    node("resolved_after_followup", "decision", "Resolved?"),
+    node("resolved_after_followup", "decision", "Resolved?", {
+      sources: [financePolicy("Page 7", "Follow-up outcomes are logged as resolved or escalated to the Finance Manager for a payment plan decision.")],
+    }),
     node("finance_manager_escalation", "process", "Finance Manager Escalation", {
       actor: "Finance Manager",
       description: "Unresolved accounts are escalated for a payment plan or write-off decision.",
+      sources: [opsEmail('"Anything unresolved after collections follow-up comes to me for a payment plan or write-off call." — Finance Manager')],
     }),
     node("close_order", "end", "Order Closed"),
   ];

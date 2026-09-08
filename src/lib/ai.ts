@@ -352,6 +352,23 @@ function makeEdge(from: string, to: string, label?: string): ProcessEdge {
   return { id: makeId("e"), from, to, label };
 }
 
+export function ensureAllNodesHaveSources(nodes: ProcessNode[]): void {
+  nodes.forEach(attachGenericSource);
+}
+
+function attachGenericSource(node: ProcessNode): void {
+  if (node.type === "start" || node.type === "end" || node.sources.length > 0) return;
+  const seed = node.label.length;
+  node.sources.push({
+    id: makeId("src"),
+    type: "document",
+    title: GENERIC_SOURCE_TITLES[seed % GENERIC_SOURCE_TITLES.length],
+    locator: `Section ${1 + (seed % 8)}`,
+    excerpt: `This document ${SOURCE_POOL_DESCRIPTIONS[seed % SOURCE_POOL_DESCRIPTIONS.length]}: "${node.label}".`,
+    confidence: "Medium",
+  });
+}
+
 const SOURCE_POOL_DESCRIPTIONS = [
   "describes the expected handling for this step",
   "confirms who owns this activity",
@@ -359,34 +376,46 @@ const SOURCE_POOL_DESCRIPTIONS = [
   "documents the standard procedure for this step",
 ];
 
+const GENERIC_SOURCE_TITLES = ["Process Documentation", "Standard Operating Procedure", "Process Playbook", "Workflow Reference Guide"];
+
 function attachSimulatedSources(nodes: ProcessNode[], uploads: UploadedSourceFile[]): void {
   const ready = uploads.filter((u) => u.status === "ready");
-  if (ready.length === 0) return;
   let idx = 0;
   nodes.forEach((n, i) => {
     if (n.type === "start" || n.type === "end") return;
-    if (i % 2 === 1) return;
-    const file = ready[idx % ready.length];
-    idx++;
-    const source: SourceRef =
-      file.kind === "video"
-        ? {
-            id: makeId("src"),
-            type: "video",
-            title: file.name,
-            locator: `${Math.floor(Math.random() * 4)}:${String(Math.floor(Math.random() * 59)).padStart(2, "0")}`,
-            excerpt: `Video walkthrough ${SOURCE_POOL_DESCRIPTIONS[i % SOURCE_POOL_DESCRIPTIONS.length]}: "${n.label}".`,
-            confidence: "Medium",
-          }
-        : {
-            id: makeId("src"),
-            type: "document",
-            title: file.name,
-            locator: `Page ${1 + (i % 6)}`,
-            excerpt: `This document ${SOURCE_POOL_DESCRIPTIONS[i % SOURCE_POOL_DESCRIPTIONS.length]}: "${n.label}".`,
-            confidence: "High",
-          };
-    n.sources.push(source);
+    if (ready.length > 0) {
+      const file = ready[idx % ready.length];
+      idx++;
+      const source: SourceRef =
+        file.kind === "video"
+          ? {
+              id: makeId("src"),
+              type: "video",
+              title: file.name,
+              locator: `${Math.floor(Math.random() * 4)}:${String(Math.floor(Math.random() * 59)).padStart(2, "0")}`,
+              excerpt: `Video walkthrough ${SOURCE_POOL_DESCRIPTIONS[i % SOURCE_POOL_DESCRIPTIONS.length]}: "${n.label}".`,
+              confidence: "Medium",
+            }
+          : {
+              id: makeId("src"),
+              type: "document",
+              title: file.name,
+              locator: `Page ${1 + (i % 6)}`,
+              excerpt: `This document ${SOURCE_POOL_DESCRIPTIONS[i % SOURCE_POOL_DESCRIPTIONS.length]}: "${n.label}".`,
+              confidence: "High",
+            };
+      n.sources.push(source);
+    } else {
+      const source: SourceRef = {
+        id: makeId("src"),
+        type: "document",
+        title: GENERIC_SOURCE_TITLES[i % GENERIC_SOURCE_TITLES.length],
+        locator: `Section ${1 + (i % 8)}`,
+        excerpt: `This document ${SOURCE_POOL_DESCRIPTIONS[i % SOURCE_POOL_DESCRIPTIONS.length]}: "${n.label}".`,
+        confidence: "Medium",
+      };
+      n.sources.push(source);
+    }
   });
 }
 
@@ -496,6 +525,8 @@ export function interpretModification(
 
     const nodeA: ProcessNode = { ...makeNode("process", partA, current.actor), sources: [...current.sources] };
     const nodeB: ProcessNode = { ...makeNode("process", partB, current.actor) };
+    attachGenericSource(nodeA);
+    attachGenericSource(nodeB);
 
     const incoming = result.edges.filter((e) => e.to === current.id);
     const outgoing = result.edges.filter((e) => e.from === current.id);
@@ -579,6 +610,7 @@ export function interpretModification(
   if (/add.*(validation|step).*before|insert.*before/.test(lower)) {
     const label = findQuoted(instruction) ?? "Validate Input";
     const newNode = makeNode("process", titleCase(label), current.actor);
+    attachGenericSource(newNode);
     const incoming = result.edges.filter((e) => e.to === current.id);
     result.edges = result.edges.filter((e) => e.to !== current.id);
     for (const e of incoming) result.edges.push(makeEdge(e.from, newNode.id, e.label));
@@ -599,6 +631,7 @@ export function interpretModification(
     const actor = role ? titleCase(role) : current.actor;
     const edgeLabel = whenMatch ? titleCase(whenMatch[1].replace(/[."']/g, "")) : "Exception";
     const exceptionNode = makeNode("process", label, actor);
+    attachGenericSource(exceptionNode);
     const endNode = makeNode("end", "End");
     result.nodes.push(exceptionNode, endNode);
     result.edges.push(makeEdge(current.id, exceptionNode.id, edgeLabel));
@@ -643,6 +676,7 @@ export function interpretDiagramModification(model: ProcessModel, instruction: s
   const result = cloneModel(model);
   const label = titleCase(instruction.replace(/^(add|create|include|insert)\s+/i, "").slice(0, 60)) || "New Step";
   const newNode = makeNode("process", label);
+  attachGenericSource(newNode);
   result.nodes.push(newNode);
 
   const base: ModificationPreview = {

@@ -5,6 +5,16 @@ import { IconCheck, IconTrash } from "./icons";
 
 const CURRENT_USER = "You";
 
+function timeAgo(ts: number): string {
+  const s = Math.max(1, Math.floor((Date.now() - ts) / 1000));
+  if (s < 60) return "Just now";
+  const m = Math.floor(s / 60);
+  if (m < 60) return `${m}m ago`;
+  const h = Math.floor(m / 60);
+  if (h < 24) return `${h}h ago`;
+  return `${Math.floor(h / 24)}d ago`;
+}
+
 export default function CommentsPanel() {
   const { state, dispatch } = useApp();
   const target = state.commentsTarget ?? { scope: "diagram" as const };
@@ -124,7 +134,9 @@ function Thread({
     <div className={`rounded-lg border p-3 ${thread.resolved ? "border-border-soft bg-surface-2 opacity-70" : "border-border-soft bg-surface"}`}>
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0">
-          <p className="text-sm font-medium text-ink">{thread.author}</p>
+          <p className="flex items-center gap-1.5 text-sm font-medium text-ink">
+            {thread.author} <span className="text-xs font-normal text-ink-faint">{timeAgo(thread.createdAt)}</span>
+          </p>
           <p className="mt-0.5 text-sm text-ink-soft">{thread.text}</p>
         </div>
         {thread.resolved && <span className="shrink-0 rounded-full bg-success-soft px-1.5 py-0.5 text-[10px] font-medium text-success">Resolved</span>}
@@ -134,7 +146,9 @@ function Thread({
         <div className="mt-2 space-y-1.5 border-l-2 border-border-soft pl-3">
           {thread.replies.map((r: CommentReply) => (
             <div key={r.id}>
-              <p className="text-xs font-medium text-ink">{r.author}</p>
+              <p className="flex items-center gap-1.5 text-xs font-medium text-ink">
+                {r.author} <span className="font-normal text-ink-faint">{timeAgo(r.createdAt)}</span>
+              </p>
               <p className="text-xs text-ink-soft">{r.text}</p>
             </div>
           ))}

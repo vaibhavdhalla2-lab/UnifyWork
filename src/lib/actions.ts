@@ -1,5 +1,5 @@
 import { useApp } from "./store";
-import { wait, enhancePrompt, generatePlan, buildModelFromPlan, interpretModification, interpretDiagramModification, generateDocumentation } from "./ai";
+import { wait, enhancePrompt, generatePlan, buildModelFromPlan, interpretModification, interpretDiagramModification, generateDocumentation, ensureAllNodesHaveSources } from "./ai";
 import { generateMermaid, parseMermaid, mergeMetadata } from "./mermaid";
 import { buildDemoModel, buildDemoUploads, buildDemoComments, DEMO_DOCUMENTATION, DEMO_PROMPT } from "../data/demo";
 import { exportDocx, exportMermaidFile, exportPdf, exportPng, copyText } from "./export";
@@ -176,10 +176,15 @@ export function useFlowActions() {
   }
 
   function applyTemplate(template: TemplateDefinition) {
+    const model = {
+      nodes: template.model.nodes.map((n) => ({ ...n, sources: [...n.sources], comments: [...n.comments] })),
+      edges: template.model.edges.map((e) => ({ ...e })),
+    };
+    ensureAllNodesHaveSources(model.nodes);
     dispatch({ type: "SET_PROMPT", text: template.prompt });
-    dispatch({ type: "APPLY_MODEL", model: template.model, label: `Template: ${template.name}` });
+    dispatch({ type: "APPLY_MODEL", model, label: `Template: ${template.name}` });
     dispatch({ type: "SET_PROCESS_NAME", name: template.name });
-    const text = generateDocumentation(template.model, template.name);
+    const text = generateDocumentation(model, template.name);
     dispatch({ type: "SET_DOCUMENTATION", text });
     dispatch({ type: "ADD_CHAT_MESSAGE", message: chatMsg("user", template.prompt) });
     dispatch({
