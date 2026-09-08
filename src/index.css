@@ -5,17 +5,17 @@
   --font-serif: "Source Serif 4", Georgia, "Times New Roman", serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
 
-  --color-canvas: #f6f4ec;
+  --color-canvas: #f7f5f0;
   --color-surface: #ffffff;
-  --color-surface-2: #f0ede2;
-  --color-border: #e3dfd0;
-  --color-border-soft: #ece8dc;
-  --color-ink: #1c1d22;
-  --color-ink-soft: #63615a;
-  --color-ink-faint: #9c9a8e;
-  --color-brand: #2f5de0;
-  --color-brand-soft: rgba(47, 93, 224, 0.08);
-  --color-brand-deep: #1e3fa8;
+  --color-surface-2: #f1eee6;
+  --color-border: #e4dfd2;
+  --color-border-soft: #ece8dd;
+  --color-ink: #14201a;
+  --color-ink-soft: #6a6662;
+  --color-ink-faint: #a19d95;
+  --color-brand: #0c2011;
+  --color-brand-soft: rgba(12, 32, 17, 0.08);
+  --color-brand-deep: #1f3d28;
   --color-success: #1d8a5d;
   --color-success-soft: rgba(29, 138, 93, 0.1);
   --color-warn: #b5730c;
@@ -25,10 +25,10 @@
   --color-exception: #7a4fc9;
   --color-exception-soft: rgba(122, 79, 201, 0.1);
 
-  --color-sidebar: #16211a;
-  --color-sidebar-2: #1e2b22;
-  --color-sidebar-ink: #cdd3c6;
-  --color-sidebar-ink-faint: #74806f;
+  --color-sidebar: #0c2011;
+  --color-sidebar-2: #1a3323;
+  --color-sidebar-ink: #bcb19e;
+  --color-sidebar-ink-faint: #6e7c73;
 
   --animate-fade-in: fade-in 0.2s ease both;
   --animate-fade-up: fade-up 0.25s cubic-bezier(0.16, 1, 0.3, 1) both;

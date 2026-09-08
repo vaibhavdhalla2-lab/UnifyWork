@@ -1,17 +1,18 @@
 import type { ProcessNode } from "../types";
 import type { LayoutNode } from "../lib/layout";
+import { systemTagOf } from "../lib/layout";
 import { useApp } from "../lib/store";
-import { IconPaperclip, IconComment, IconSparkle } from "./icons";
+import { IconPaperclip, IconComment, IconSparkle, IconUser, IconDatabase } from "./icons";
 
-const TYPE_STYLES: Record<ProcessNode["type"], { bg: string; border: string; text: string }> = {
-  start: { bg: "bg-success-soft", border: "border-success/40", text: "text-success" },
-  end: { bg: "bg-ink/5", border: "border-ink-faint/40", text: "text-ink-soft" },
-  process: { bg: "bg-brand-soft", border: "border-brand/30", text: "text-ink" },
-  decision: { bg: "bg-warn-soft", border: "border-warn/40", text: "text-warn" },
-  io: { bg: "bg-surface-2", border: "border-ink-faint/40", text: "text-ink-soft" },
+const TYPE_STYLES: Record<ProcessNode["type"], { bg: string; border: string; text: string; accent: string }> = {
+  start: { bg: "bg-success-soft", border: "border-success/40", text: "text-success", accent: "bg-success" },
+  end: { bg: "bg-ink/5", border: "border-ink-faint/40", text: "text-ink-soft", accent: "bg-ink-faint" },
+  process: { bg: "bg-brand-soft", border: "border-brand/30", text: "text-ink", accent: "bg-brand" },
+  decision: { bg: "bg-warn-soft", border: "border-warn/40", text: "text-warn", accent: "bg-warn" },
+  io: { bg: "bg-surface-2", border: "border-ink-faint/40", text: "text-ink-soft", accent: "bg-ink-faint" },
 };
 
-const EXCEPTION_STYLE = { bg: "bg-exception-soft", border: "border-exception/50", text: "text-exception" };
+const EXCEPTION_STYLE = { bg: "bg-exception-soft", border: "border-exception/50", text: "text-exception", accent: "bg-exception" };
 
 export default function DiagramNode({
   node,
@@ -26,6 +27,7 @@ export default function DiagramNode({
 }) {
   const { dispatch } = useApp();
   const style = isException && node.type === "process" ? EXCEPTION_STYLE : TYPE_STYLES[node.type];
+  const systemTag = systemTagOf(node);
 
   const commonProps = {
     onClick: (e: React.MouseEvent) => {
@@ -99,18 +101,32 @@ export default function DiagramNode({
     <foreignObject x={layout.x - layout.w / 2} y={layout.y - layout.h / 2} width={layout.w} height={layout.h}>
       <div
         {...commonProps}
-        className={`relative flex h-full w-full cursor-pointer flex-col justify-center gap-1 border shadow-sm transition ${style.bg} ${
+        className={`relative flex h-full w-full cursor-pointer flex-col justify-center gap-1 overflow-hidden border shadow-sm transition ${style.bg} ${
           selected ? "border-brand ring-4 ring-brand/15" : style.border
-        } ${isIo ? "px-7 py-2" : "rounded-xl px-3 py-2"}`}
+        } ${isIo ? "px-7 py-2" : "rounded-xl py-2 pl-4 pr-3"}`}
         style={isIo ? { clipPath: "polygon(8% 0%, 100% 0%, 92% 100%, 0% 100%)" } : undefined}
       >
+        {!isIo && <span className={`absolute inset-y-0 left-0 w-1 ${style.accent}`} />}
         {node.aiGenerated && (
           <span className="absolute right-1.5 top-1.5 grid h-4 w-4 place-items-center rounded-full bg-brand text-white" title="AI-generated">
             <IconSparkle className="h-2.5 w-2.5" />
           </span>
         )}
         <p className="line-clamp-2 pr-4 text-[13px] font-semibold leading-tight text-ink">{node.label}</p>
-        {node.actor && <p className="truncate text-[11px] text-ink-soft">{node.actor}</p>}
+        {(node.actor || systemTag) && (
+          <div className="flex flex-wrap items-center gap-1">
+            {node.actor && (
+              <span className="flex items-center gap-1 truncate rounded-full bg-surface px-1.5 py-0.5 text-[10.5px] font-medium text-ink-soft">
+                <IconUser className="h-2.5 w-2.5 shrink-0" /> <span className="truncate">{node.actor}</span>
+              </span>
+            )}
+            {systemTag && (
+              <span className="flex items-center gap-1 truncate rounded-full bg-surface px-1.5 py-0.5 text-[10.5px] font-medium text-ink-soft">
+                <IconDatabase className="h-2.5 w-2.5 shrink-0" /> <span className="truncate">{systemTag}</span>
+              </span>
+            )}
+          </div>
+        )}
         <div className="mt-0.5 flex items-center gap-2">
           {node.sources.length > 0 && (
             <button
@@ -140,4 +156,3 @@ export default function DiagramNode({
     </foreignObject>
   );
 }
-

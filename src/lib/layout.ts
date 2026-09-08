@@ -1,4 +1,10 @@
-import type { ProcessModel } from "../types";
+import type { ProcessModel, ProcessNode } from "../types";
+
+const SYSTEM_TAG_RE = /system:\s*([^.\n]+)/i;
+export function systemTagOf(node: Pick<ProcessNode, "description">): string | null {
+  const m = node.description?.match(SYSTEM_TAG_RE);
+  return m ? m[1].trim() : null;
+}
 
 export interface LayoutNode {
   id: string;
@@ -25,15 +31,17 @@ export interface LayoutResult {
 
 const LAYER_GAP = 150;
 const COL_GAP = 60;
-const DEFAULT_W = 220;
-const DEFAULT_H = 92;
+const DEFAULT_W = 232;
+const DEFAULT_H = 108;
 const DECISION_SIZE = 150;
 const TERMINAL_H = 64;
 
-function sizeFor(type: string): { w: number; h: number } {
+function sizeFor(node: Pick<ProcessNode, "type" | "actor" | "description"> | undefined): { w: number; h: number } {
+  const type = node?.type ?? "process";
   if (type === "decision") return { w: DECISION_SIZE, h: DECISION_SIZE };
   if (type === "start" || type === "end") return { w: 180, h: TERMINAL_H };
-  return { w: DEFAULT_W, h: DEFAULT_H };
+  const hasTags = !!node?.actor || (node && !!systemTagOf(node));
+  return { w: DEFAULT_W, h: hasTags ? DEFAULT_H : DEFAULT_H - 22 };
 }
 
 export function computeLayout(model: ProcessModel): LayoutResult {
@@ -169,7 +177,7 @@ export function computeLayout(model: ProcessModel): LayoutResult {
 
   for (const lk of sortedLayerKeys) {
     const ids = layers.get(lk)!;
-    const sizes = ids.map((id) => sizeFor(nodeById.get(id)?.type ?? "process"));
+    const sizes = ids.map((id) => sizeFor(nodeById.get(id)));
     const totalWidth = sizes.reduce((s, sz) => s + sz.w, 0) + COL_GAP * Math.max(0, ids.length - 1);
     maxWidth = Math.max(maxWidth, totalWidth);
     let cursorX = -totalWidth / 2;

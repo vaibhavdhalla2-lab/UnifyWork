@@ -29,7 +29,7 @@ export default function Canvas() {
 
   useEffect(() => {
     if (layout && state.pan.x === 0 && state.pan.y === 0 && state.zoom === 1) {
-      fitToScreen();
+      resetZoom();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.model !== null]);
@@ -49,8 +49,10 @@ export default function Canvas() {
   function resetZoom() {
     if (!layout || !viewportRef.current) return;
     const rect = viewportRef.current.getBoundingClientRect();
+    const topPadding = 48;
+    const panY = layout.height <= rect.height ? (rect.height - layout.height) / 2 : topPadding;
     dispatch({ type: "SET_ZOOM", zoom: 1 });
-    dispatch({ type: "SET_PAN", pan: { x: (rect.width - layout.width) / 2, y: (rect.height - layout.height) / 2 } });
+    dispatch({ type: "SET_PAN", pan: { x: (rect.width - layout.width) / 2, y: panY } });
   }
 
   function zoomBy(delta: number, center?: { x: number; y: number }) {
