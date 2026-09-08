@@ -15,7 +15,7 @@ export default function ArtifactPanel() {
         {state.view === "diagram" && <Canvas />}
         {state.view === "mermaid" && <MermaidView />}
         {state.view === "documentation" && <DocumentationView />}
-        <RightPanel />
+        {state.view !== "documentation" && <RightPanel />}
       </div>
     </div>
   );

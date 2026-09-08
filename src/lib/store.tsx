@@ -14,7 +14,7 @@ import type {
 } from "../types";
 import { generateMermaid, parseMermaid, type MermaidParseError, mergeMetadata } from "./mermaid";
 import { makeId } from "./id";
-import { generateDocumentation } from "./ai";
+import { generateDocumentation, ensureAllNodesHaveSources } from "./ai";
 
 export interface Toast {
   id: string;
@@ -545,6 +545,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
       if (raw) {
         const payload = JSON.parse(raw) as Partial<AppState>;
         const model = payload.model ?? null;
+        if (model) ensureAllNodesHaveSources(model.nodes);
+        for (const h of payload.history ?? []) ensureAllNodesHaveSources(h.model.nodes);
         const mermaidText = model ? generateMermaid(model) : "";
         dispatch({
           type: "HYDRATE",
