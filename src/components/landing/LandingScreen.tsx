@@ -114,7 +114,7 @@ export default function LandingScreen() {
           <IconSparkle className="h-6 w-6" />
         </span>
         <h1 className="text-sm font-semibold uppercase tracking-[0.2em] text-ink-faint">Smart Diagram Agent</h1>
-        <p className="mt-3 font-serif text-3xl text-ink sm:text-4xl">What process would you like to visualize?</p>
+        <p className="mt-3 text-3xl font-semibold text-ink sm:text-4xl">What process would you like to visualize?</p>
       </div>
 
       <div className="w-full max-w-2xl">

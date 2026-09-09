@@ -151,7 +151,7 @@ function MarkdownBody({ text }: { text: string }) {
     if (line.startsWith("# ")) {
       flushList();
       blocks.push(
-        <h1 key={idx} className="mb-3 font-serif text-3xl text-brand-deep">
+        <h1 key={idx} className="mb-3 text-3xl font-semibold text-ink">
           {line.slice(2)}
         </h1>,
       );

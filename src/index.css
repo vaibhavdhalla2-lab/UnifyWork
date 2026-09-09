@@ -2,19 +2,18 @@
 
 @theme {
   --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  --font-serif: "Source Serif 4", Georgia, "Times New Roman", serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
 
-  --color-canvas: #f7f5f0;
+  --color-canvas: #f8f8f7;
   --color-surface: #ffffff;
-  --color-surface-2: #f1eee6;
-  --color-border: #e4dfd2;
-  --color-border-soft: #ece8dd;
-  --color-ink: #14201a;
-  --color-ink-soft: #6a6662;
-  --color-ink-faint: #a19d95;
+  --color-surface-2: #f4f4f5;
+  --color-border: #e6e6e8;
+  --color-border-soft: #edeeef;
+  --color-ink: #18181b;
+  --color-ink-soft: #6b7280;
+  --color-ink-faint: #9ca3af;
   --color-brand: #0c2011;
-  --color-brand-soft: rgba(12, 32, 17, 0.08);
+  --color-brand-soft: rgba(12, 32, 17, 0.07);
   --color-brand-deep: #1f3d28;
   --color-success: #1d8a5d;
   --color-success-soft: rgba(29, 138, 93, 0.1);
@@ -85,5 +84,4 @@
   .scrollbar-none { scrollbar-width: none; -ms-overflow-style: none; }
   .scrollbar-none::-webkit-scrollbar { display: none; }
   .animate-pulse-soft { animation: pulse-soft 1.4s ease-in-out infinite; }
-  .font-serif { font-family: var(--font-serif); }
 }

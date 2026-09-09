@@ -80,7 +80,7 @@ export default function PlanView() {
         <div className="flex items-center justify-between border-b border-border px-5 py-3.5">
           <div>
             <p className="text-xs font-semibold uppercase tracking-wide text-brand-deep">AI Plan</p>
-            <h2 className="font-serif text-xl text-ink">{plan.processTitle}</h2>
+            <h2 className="text-xl font-semibold text-ink">{plan.processTitle}</h2>
           </div>
           <button onClick={actions.closePlanModal} className="grid h-8 w-8 place-items-center rounded-md text-ink-faint hover:bg-surface-2">
             <IconX />

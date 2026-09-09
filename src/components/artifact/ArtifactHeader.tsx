@@ -36,7 +36,7 @@ export default function ArtifactHeader() {
                 setEditingName(false);
               }
             }}
-            className="min-w-0 max-w-[260px] rounded-md border border-brand px-2 py-1 font-serif text-base text-ink outline-none"
+            className="min-w-0 max-w-[260px] rounded-md border border-brand px-2 py-1 text-base font-semibold text-ink outline-none"
           />
         ) : (
           <button
@@ -44,7 +44,7 @@ export default function ArtifactHeader() {
               setNameDraft(state.processName);
               setEditingName(true);
             }}
-            className="truncate max-w-[260px] rounded-md px-1.5 py-1 font-serif text-base text-ink hover:bg-surface-2"
+            className="truncate max-w-[260px] rounded-md px-1.5 py-1 text-base font-semibold text-ink hover:bg-surface-2"
             title="Rename process"
           >
             {state.processName}
