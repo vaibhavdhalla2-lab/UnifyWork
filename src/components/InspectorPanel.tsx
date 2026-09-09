@@ -139,14 +139,7 @@ function NodeInspector({ nodeId }: { nodeId: string }) {
   return (
     <div className="flex h-full flex-col">
       <div className="border-b border-border-soft p-4">
-        <div className="mb-1 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-ink-faint">
-          Selected Component
-          {node.aiGenerated && (
-            <span className="flex items-center gap-0.5 rounded-full bg-brand-soft px-1.5 py-0.5 text-[10px] font-medium text-brand-deep">
-              <IconSparkle className="h-2.5 w-2.5" /> AI
-            </span>
-          )}
-        </div>
+        <div className="mb-1 text-xs font-semibold uppercase tracking-wide text-ink-faint">Selected Component</div>
         {editing ? (
           <input
             value={draft.label}

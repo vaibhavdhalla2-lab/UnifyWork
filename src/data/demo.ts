@@ -50,6 +50,35 @@ export function buildDemoModel(): ProcessModel {
     ],
   };
 
+  const validateOrderComment = {
+    id: makeId("c"),
+    author: "Diego Ramirez",
+    text: "Can we surface the missing contract reference as a specific error instead of a generic \"incomplete\" flag?",
+    createdAt: Date.UTC(2026, 7, 12, 15, 5),
+    resolved: false,
+    replies: [],
+  };
+
+  const escalateCsmComment = {
+    id: makeId("c"),
+    author: "Marcus Webb",
+    text: "We should log a reason code here so we can see whether escalations are mostly address issues or carrier delays.",
+    createdAt: Date.UTC(2026, 7, 11, 10, 22),
+    resolved: true,
+    replies: [
+      { id: makeId("cr"), author: "You", text: "Agreed — added to the backlog for the CSM tooling update.", createdAt: Date.UTC(2026, 7, 11, 16, 15) },
+    ],
+  };
+
+  const collectionsFollowupComment = {
+    id: makeId("c"),
+    author: "Priya Shah",
+    text: "How many follow-up touches happen before this moves to \"Resolved?\" — worth documenting the cadence here.",
+    createdAt: Date.UTC(2026, 7, 15, 9, 45),
+    resolved: false,
+    replies: [],
+  };
+
   const n: ProcessNode[] = [
     node("order_received", "start", "Customer Submits Order", { description: "The customer places an order through the storefront or a Sales representative." }),
     node("create_order", "process", "Create Order in CRM", {
@@ -64,6 +93,7 @@ export function buildDemoModel(): ProcessModel {
         sopDoc("Page 4", "Order validation must confirm mandatory fields, pricing accuracy and contract terms before credit review."),
         slackThread('"We keep seeing orders missing the contract reference — flag those before they reach credit." — Order Desk Lead'),
       ],
+      comments: [validateOrderComment],
     }),
     node("order_complete", "decision", "Order Complete?", {
       description: "Checks whether all mandatory fields, pricing and contract terms are present.",
@@ -137,6 +167,7 @@ export function buildDemoModel(): ProcessModel {
       actor: "Customer Service Manager",
       description: "After two failed attempts, the Customer Service Manager contacts the customer to arrange delivery.",
       sources: [opsEmail('"After two failed attempts, route it to me directly and I\'ll coordinate with the customer." — Customer Service Manager')],
+      comments: [escalateCsmComment],
     }),
     node("invoice", "process", "Generate Invoice", {
       actor: "Finance",
@@ -174,6 +205,7 @@ export function buildDemoModel(): ProcessModel {
     node("collections_followup", "process", "Collections Follow-up", {
       actor: "Collections",
       sources: [financePolicy("Page 6", "Accounts unpaid after the grace period move to active collections follow-up.")],
+      comments: [collectionsFollowupComment],
     }),
     node("resolved_after_followup", "decision", "Resolved?", {
       sources: [financePolicy("Page 7", "Follow-up outcomes are logged as resolved or escalated to the Finance Manager for a payment plan decision.")],

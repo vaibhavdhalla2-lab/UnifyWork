@@ -2,7 +2,7 @@ import { Handle, Position, type NodeProps } from "@xyflow/react";
 import type { ProcessNode } from "../types";
 import { systemTagOf } from "../lib/layout";
 import { useApp } from "../lib/store";
-import { IconPaperclip, IconComment, IconSparkle, IconUser, IconDatabase } from "./icons";
+import { IconPaperclip, IconComment, IconUser, IconDatabase } from "./icons";
 
 const TYPE_STYLES: Record<ProcessNode["type"], { bg: string; border: string; text: string; accent: string }> = {
   start: { bg: "bg-success-soft", border: "border-success/40", text: "text-success", accent: "bg-success" },
@@ -110,12 +110,7 @@ export default function FlowNode({ data, selected }: NodeProps & { data: FlowNod
     >
       <Handles />
       {!isIo && <span className={`absolute inset-y-0 left-0 w-1 ${style.accent}`} />}
-      {node.aiGenerated && (
-        <span className="absolute right-1.5 top-1.5 grid h-4 w-4 place-items-center rounded-full bg-brand text-white" title="AI-generated">
-          <IconSparkle className="h-2.5 w-2.5" />
-        </span>
-      )}
-      <p className="line-clamp-2 pr-4 text-[13px] font-semibold leading-tight text-ink">{node.label}</p>
+      <p className="line-clamp-2 text-[13px] font-semibold leading-tight text-ink">{node.label}</p>
       {(node.actor || systemTag) && (
         <div className="flex flex-wrap items-center gap-1">
           {node.actor && (
